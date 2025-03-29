@@ -1,0 +1,37 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+}
+
+header {
+    background: #673AB7;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+}
+
+.container, .mall-container, .ticket {
+    max-width: 800px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px #ccc;
+}
+
+/* Seat Selection */
+.seat {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    background: #4CAF50;
+    color: white;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+}
+.seat.selected { background: #FF5722; }

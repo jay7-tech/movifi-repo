@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket - Show Booking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Your Ticket</h1>
+</header>
+
+<style>
+
+.ticket {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 50px auto;
+    text-align: center;
+}
+.ticket h2 {
+    color: #673AB7;
+    margin-bottom: 10px;
+}
+.ticket p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+.ticket p span {
+    font-weight: bold;
+}
+.ticket p span.emoji {
+    font-size: 24px;
+    margin-right: 5px;
+}
+.ticket p span.emoji:hover {
+    transform: scale(1.2);
+    transition: transform 0.3s;
+}
+.ticket p span.emoji:hover::after {
+    content: " (Click to copy)";
+    font-size: 14px;
+    color: #999;
+}
+.ticket p span.emoji:active {
+    transform: scale(1);
+    transition: transform 0.1s;
+}
+.ticket p span.emoji:active::after {
+    content: " (Copied!)";
+    font-size: 14px;
+    color: #999;
+}
+.ticket p span.emoji:hover::after,
+
+button:hover {
+    cursor: pointer;
+    color: #673AB7;
+    align-items: center;
+}
+
+</style>
+<div class="ticket">
+    <h2>🎥 Movie: Intestellar</h2>
+    <p>🕒 Showtime: 1:00 PM</p>
+    <p>📍 Mall: orion</p>
+    <p>💺 Seats: A1, A2</p>
+    <p>💳 Payment: ₹1200</p>
+</div>
+
+<button onclick="window.location.href='home.html'">Back to Home</button>
+
+</body>
+</html>
