@@ -7,40 +7,10 @@ A modern web application for booking shows and events, built with Spring Boot an
 ```
 movifi-repo/
 ├── backend/                      # Spring Boot Backend
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── com/
-│   │   │   │       └── movifi/
-│   │   │   │           ├── MovifiApplication.java
-│   │   │   │           ├── config/           # Configuration classes
-│   │   │   │           ├── controller/       # REST controllers
-│   │   │   │           ├── model/           # Entity classes
-│   │   │   │           ├── repository/      # JPA repositories
-│   │   │   │           ├── service/         # Business logic
-│   │   │   │           ├── security/        # Security configuration
-│   │   │   │           └── util/            # Utility classes
-│   │   │   └── resources/
-│   │   │       ├── application.properties
-│   │   │       ├── application-dev.properties
-│   │   │       └── application-prod.properties
-│   │   └── test/              # Test classes
-│   ├── pom.xml
-│   └── README.md
-│
+│   
 ├── frontend/                    # Frontend Application
-│   ├── src/
-│   │   ├── assets/            # Images, fonts, etc.
-│   │   ├── css/               # CSS files
-│   │   ├── js/                # JavaScript files
-│   │   └── pages/             # HTML pages
-│   ├── index.html
-│   └── README.md
 │
 ├── docs/                       # Documentation
-│   ├── api/                   # API documentation
-│   └── setup/                 # Setup guides
-│
 └── README.md                   # Project root README
 ```
 
