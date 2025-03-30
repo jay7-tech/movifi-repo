@@ -1,0 +1,5 @@
+com\movifi\MovifiApplication.class
+com\movifi\controller\MovieController.class
+com\movifi\entity\Movie.class
+com\movifi\repository\MovieRepository.class
+com\movifi\config\WebConfig.class
