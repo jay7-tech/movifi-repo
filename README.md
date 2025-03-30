@@ -58,14 +58,10 @@ movifi-repo/
 2. Serve the application using a local server:
 
    ```bash
-   # Using Python
-   python -m http.server 5500
-
-   # Or using Node.js
-   npx serve
+   npm run dev
    ```
 
-3. Open http://localhost:5500 in your browser
+3. Open http://localhost:3000 in your browser
 
 ## Features
 
