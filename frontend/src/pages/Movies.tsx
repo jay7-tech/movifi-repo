@@ -50,6 +50,7 @@ interface Movie {
 }
 
 interface MovieFormData {
+  id: number;
   title: string;
   overview: string;
   posterPath: string;
@@ -160,6 +161,7 @@ const Movies = () => {
   const [backendError, setBackendError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [newMovie, setNewMovie] = useState<MovieFormData>({
+    id: 0,
     title: '',
     overview: '',
     posterPath: '',
@@ -202,7 +204,7 @@ const Movies = () => {
         // Only fetch backend movies if we're on the MY MOVIES tab
         if (selectedTab === 1) {
           try {
-            const backendData = await backendMovieService.getAllMovies();
+            const backendData = await backendMovieService.getMovies();
             setBackendMovies(backendData);
             setDisplayedMovies(backendData);
           } catch (backendErr: any) {
@@ -283,6 +285,7 @@ const Movies = () => {
   const handleDialogClose = () => {
     setOpenDialog(false);
     setNewMovie({
+      id: 0,
       title: '',
       overview: '',
       posterPath: '',
@@ -303,7 +306,7 @@ const Movies = () => {
     event.preventDefault();
     try {
       await backendMovieService.createMovie(newMovie);
-      const updatedMovies = await backendMovieService.getAllMovies();
+      const updatedMovies = await backendMovieService.getMovies();
       setBackendMovies(updatedMovies);
       setDisplayedMovies(selectedTab === 0 ? movies : updatedMovies);
       handleDialogClose();
@@ -397,7 +400,7 @@ const Movies = () => {
                   const fetchMovies = async () => {
                     try {
                       setLoading(true);
-                      const backendData = await backendMovieService.getAllMovies();
+                      const backendData = await backendMovieService.getMovies();
                       setBackendMovies(backendData);
                       setDisplayedMovies(backendData);
                     } catch (err) {
