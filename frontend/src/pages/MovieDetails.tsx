@@ -125,73 +125,193 @@ const MovieDetails = () => {
       <Box
         sx={{
           height: '60vh',
-          background: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          position: 'relative',
+          overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
-          color: 'white',
+          justifyContent: 'center',
+          backgroundImage: movie.backdrop_path 
+            ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
+            : 'url("/images/cinema-background.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
-        <Container>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={4}>
-              <Paper
-                elevation={3}
-                sx={{
-                  height: '400px',
-                  overflow: 'hidden',
-                  borderRadius: 2,
+        {/* Overlay */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 1,
+          }}
+        />
+      </Box>
+
+      {/* Movie Content */}
+      <Container sx={{ mt: -8, position: 'relative', zIndex: 2 }}>
+        <Grid container spacing={4}>
+          {/* Movie Poster */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={3}
+              sx={{
+                height: '90%',
+                overflow: 'hidden',
+                borderRadius: 6,
+                bgcolor: 'white',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              }}
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  aspectRatio: '2/3',
+                  objectFit: 'cover',
+                }}
+              />
+            </Paper>
+          </Grid>
+
+          {/* Movie Info */}
+          <Grid item xs={12} md={8}>
+            <Paper 
+              sx={{ 
+                height: '100%', 
+                p: 4, 
+                bgcolor: 'white',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              }}
+            >
+              <Typography 
+                variant="h4" 
+                gutterBottom 
+                sx={{ 
+                  color: '#1a237e', 
+                  fontWeight: 700,
+                  fontSize: { xs: '1.8rem', md: '2.2rem' },
+                  mb: 2,
                 }}
               >
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={8}>
-              <Typography variant="h2" gutterBottom>
                 {movie.title}
               </Typography>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Rating value={movie.vote_average / 2} precision={0.1} readOnly />
-                <Typography variant="body1" sx={{ ml: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Rating 
+                  value={movie.vote_average / 2} 
+                  precision={0.1} 
+                  readOnly 
+                  sx={{ 
+                    '& .MuiRating-iconFilled': {
+                      color: '#ffd700',
+                    },
+                    '& .MuiRating-iconEmpty': {
+                      color: '#e0e0e0',
+                    },
+                  }}
+                />
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    ml: 1, 
+                    color: '#455a64',
+                    fontWeight: 500,
+                    fontSize: '1.1rem',
+                  }}
+                >
                   ({movie.vote_average.toFixed(1)}/10)
                 </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
                 <Chip
                   icon={<CalendarTodayIcon />}
                   label={new Date(movie.release_date).toLocaleDateString()}
+                  sx={{ 
+                    bgcolor: '#f5f5f5',
+                    '& .MuiChip-label': {
+                      fontWeight: 500,
+                      color: '#1a237e',
+                    },
+                    '& .MuiChip-icon': {
+                      color: '#1a237e',
+                    },
+                  }}
                 />
                 <Chip
                   icon={<AccessTimeIcon />}
                   label={`${movie.runtime} minutes`}
+                  sx={{ 
+                    bgcolor: '#f5f5f5',
+                    '& .MuiChip-label': {
+                      fontWeight: 500,
+                      color: '#1a237e',
+                    },
+                    '& .MuiChip-icon': {
+                      color: '#1a237e',
+                    },
+                  }}
                 />
                 <Chip
                   icon={<LanguageIcon />}
                   label={movie.original_language.toUpperCase()}
+                  sx={{ 
+                    bgcolor: '#f5f5f5',
+                    '& .MuiChip-label': {
+                      fontWeight: 500,
+                      color: '#1a237e',
+                    },
+                    '& .MuiChip-icon': {
+                      color: '#1a237e',
+                    },
+                  }}
                 />
               </Box>
 
-              <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+              <Box sx={{ display: 'flex', gap: 1, mb: 4, flexWrap: 'wrap' }}>
                 {movie.genres.map((genre) => (
-                  <Chip key={genre.id} label={genre.name} />
+                  <Chip 
+                    key={genre.id} 
+                    label={genre.name}
+                    sx={{ 
+                      bgcolor: '#e3f2fd', 
+                      color: '#1a237e',
+                      fontWeight: 500,
+                      '&:hover': {
+                        bgcolor: '#bbdefb',
+                      },
+                    }}
+                  />
                 ))}
               </Box>
 
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom 
+                sx={{ 
+                  color: '#1a237e', 
+                  fontWeight: 600,
+                  fontSize: '1.4rem',
+                  mb: 2,
+                }}
+              >
                 Overview
               </Typography>
-              <Typography variant="body1" paragraph>
+              <Typography 
+                variant="body1" 
+                paragraph 
+                sx={{ 
+                  color: '#455a64', 
+                  lineHeight: 1.8,
+                  fontSize: '1.1rem',
+                  mb: 3,
+                }}
+              >
                 {movie.overview}
               </Typography>
 
@@ -202,6 +322,10 @@ const MovieDetails = () => {
                 startIcon={<AccessTimeIcon />}
                 sx={{
                   bgcolor: 'red',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  padding: '12px 24px',
                   '&:hover': {
                     bgcolor: 'darkred',
                   },
@@ -209,52 +333,87 @@ const MovieDetails = () => {
               >
                 Book Tickets
               </Button>
-            </Grid>
+            </Paper>
           </Grid>
-        </Container>
-      </Box>
-
-      {/* Cast Section */}
-      <Container sx={{ py: 8 }}>
-        <Typography variant="h4" gutterBottom>
-          Cast
-        </Typography>
-        <Grid container spacing={2}>
-          {credits?.cast.slice(0, 6).map((actor) => (
-            <Grid item key={actor.id} xs={6} sm={4} md={2}>
-              <Paper
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                }}
-              >
-                <img
-                  src={
-                    actor.profile_path
-                      ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
-                      : 'https://via.placeholder.com/200x300'
-                  }
-                  alt={actor.name}
-                  style={{
-                    width: '100%',
-                    height: '300px',
-                    objectFit: 'cover',
-                  }}
-                />
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="subtitle1" noWrap>
-                    {actor.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {actor.character}
-                  </Typography>
-                </Box>
-              </Paper>
-            </Grid>
-          ))}
         </Grid>
+
+        {/* Cast Section */}
+        <Box sx={{ mt: 8, mb: 6 }}>
+          <Typography 
+            variant="h5" 
+            gutterBottom 
+            sx={{ 
+              color: 'white', 
+              fontWeight: 600,
+              fontSize: '1.8rem',
+              mb: 3,
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            }}
+          >
+            Cast
+          </Typography>
+          <Grid container spacing={3}>
+            {credits?.cast.slice(0, 6).map((actor) => (
+              <Grid item key={actor.id} xs={6} sm={4} md={2}>
+                <Paper
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    borderRadius: 2,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                    bgcolor: 'white',
+                    transition: 'transform 0.3s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-5px)',
+                    },
+                  }}
+                >
+                  <img
+                    src={
+                      actor.profile_path
+                        ? `https://image.tmdb.org/t/p/w500${actor.profile_path}`
+                        : '/images/default-avatar.png'
+                    }
+                    alt={actor.name}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      aspectRatio: '2/3',
+                      objectFit: 'cover',
+                    }}
+                  />
+                  <Box sx={{ p: 2 }}>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{ 
+                        fontWeight: 600,
+                        color: '#1a237e',
+                        mb: 0.5,
+                        textAlign: 'center',
+                        fontSize: '1rem',
+                      }}
+                    >
+                      {actor.name}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: '#455a64',
+                        textAlign: 'center',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {actor.character}
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       </Container>
 
       <LoginDialog

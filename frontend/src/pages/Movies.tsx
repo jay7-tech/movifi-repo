@@ -31,6 +31,7 @@ import {
   Paper,
   Skeleton,
   InputLabel,
+  Pagination,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -38,6 +39,8 @@ import AddIcon from '@mui/icons-material/Add';
 import movieService, { regions } from '../services/movieService';
 import backendMovieService, { BackendMovie } from '../services/backendMovieService';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import LoginDialog from '../components/auth/LoginDialog';
+import authService from '../services/authService';
 
 interface Movie {
   id: number;
@@ -79,11 +82,11 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onBook }) => {
         flexDirection: 'column',
         cursor: 'pointer',
         borderRadius: 2,
-        boxShadow: 1,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        bgcolor: '#1a1a1a',
+        transition: 'transform 0.3s ease-in-out',
         '&:hover': {
-          transform: 'scale(1.03)',
-          transition: 'transform 0.2s ease-in-out',
-          boxShadow: 3,
+          transform: 'scale(1.05)',
         },
       }}
       onClick={() => navigate(`/movie/${movie.id}`)}
@@ -97,41 +100,92 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onBook }) => {
             : posterPath
         }
         alt={title}
-        sx={{ objectFit: 'cover' }}
+        sx={{
+          objectFit: 'cover',
+          borderBottom: '2px solid #333',
+          aspectRatio: '2/3',
+          width: '100%',
+          height: 'auto',
+        }}
       />
-      <CardContent>
-        <Typography 
-          gutterBottom 
-          variant="h6" 
-          component="div" 
-          noWrap
-          sx={{ color: '#1a237e' }}
-        >
-          {title}
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Rating
-            value={rating / 2}
-            precision={0.5}
-            readOnly
-            size="small"
-          />
-          <Chip
-            label="BOOK"
-            color="primary"
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onBook(movie.id);
+      <CardContent sx={{ 
+        flexGrow: 1, 
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '200px',
+      }}>
+        <Box>
+          <Typography 
+            gutterBottom 
+            variant="h6" 
+            component="div"
+            sx={{
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              mb: 1,
+              height: '2.5rem',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
             }}
-          />
+          >
+            {title}
+          </Typography>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 1,
+          }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#e0e0e0',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
+            >
+              ⭐ {rating.toFixed(1)}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#e0e0e0',
+                fontWeight: 500,
+              }}
+            >
+              {new Date(releaseDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </Typography>
+          </Box>
         </Box>
-        <Typography 
-          variant="body2" 
-          sx={{ color: '#455a64' }}
+        <Button
+          variant="contained"
+          fullWidth
+          sx={{
+            mt: 1,
+            bgcolor: 'red',
+            '&:hover': {
+              bgcolor: 'darkred',
+            },
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onBook(movie.id);
+          }}
         >
-          Release: {new Date(releaseDate).toLocaleDateString()}
-        </Typography>
+          Book Now
+        </Button>
       </CardContent>
     </Card>
   );
@@ -173,6 +227,10 @@ const Movies = () => {
     message: '',
     severity: 'success' as 'success' | 'error',
   });
+  const [sortBy, setSortBy] = useState('popularity.desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const genres = [
     { id: 'all', name: 'All Genres' },
@@ -352,6 +410,18 @@ const Movies = () => {
   };
 
   const filteredMovies = getFilteredMovies();
+
+  const handleBookNow = (movieId: number) => {
+    if (!authService.isAuthenticated()) {
+      setIsLoginOpen(true);
+      return;
+    }
+    navigate(`/booking/${movieId}`);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoginOpen(false);
+  };
 
   if (selectedTab === 1 && backendError) {
     return (
@@ -595,376 +665,264 @@ const Movies = () => {
   }
 
   return (
-    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', pt: 8 }}>
-      <Container sx={{ py: 4 }}>
-        {/* Tabs Section */}
-        <Box sx={{ 
-          borderBottom: 1, 
-          borderColor: 'divider', 
-          mb: 4,
-          bgcolor: 'white',
-          borderRadius: '16px',
-          p: 2,
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        }}>
-          <Tabs 
-            value={selectedTab} 
-            onChange={handleTabChange} 
-            aria-label="movie categories"
-            variant="fullWidth"
-            sx={{
-              '& .MuiTab-root': {
-                color: '#546e7a',
-                fontWeight: 500,
-                fontSize: '1rem',
-                textTransform: 'none',
-                '&.Mui-selected': {
-                  color: '#e53935',
-                  fontWeight: 600
-                }
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#e53935'
-              }
-            }}
-          >
-            <Tab label="IN CINEMAS" />
-            <Tab label="MY MOVIES" />
-          </Tabs>
-        </Box>
-
+    <Box sx={{ minHeight: '100vh', bgcolor: '#000000', pt: 8 }}>
+      <Container maxWidth="lg">
         {/* Search and Filter Section */}
-        <Paper 
-          elevation={2} 
-          sx={{ 
-            p: 3, 
-            mb: 4, 
-            borderRadius: '16px',
-            bgcolor: 'white',
-            transition: 'all 0.3s ease'
+        <Paper
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            bgcolor: '#1a1a1a',
+            border: '1px solid #333',
           }}
         >
-          <Grid container spacing={3} alignItems="center">
+          <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                variant="outlined"
-                placeholder="Search movies by title..."
+                placeholder="Search movies..."
                 value={searchQuery}
-                onChange={handleSearch}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: '#9e9e9e' }} />
+                      <SearchIcon sx={{ color: '#666' }} />
                     </InputAdornment>
                   ),
-                  endAdornment: searchQuery && (
-                    <InputAdornment position="end">
-                      <IconButton 
-                        size="small" 
-                        onClick={clearSearch}
-                        sx={{ 
-                          '&:hover': { 
-                            color: '#e53935' 
-                          } 
-                        }}
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                  sx: { 
-                    borderRadius: '12px',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e0e0e0'
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: '#121212',
+                    '& fieldset': {
+                      borderColor: '#333',
                     },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e53935'
+                    '&:hover fieldset': {
+                      borderColor: '#666',
                     },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e53935'
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'red',
                     },
-                    '& .MuiInputBase-input': {
-                      color: '#37474f',
-                      '&::placeholder': {
-                        color: '#9e9e9e',
-                        opacity: 1
-                      }
-                    }
-                  }
+                    '& input': {
+                      color: 'white',
+                    },
+                    '& input::placeholder': {
+                      color: '#999',
+                    },
+                  },
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth>
-                <InputLabel 
-                  sx={{ 
-                    color: '#9e9e9e',
-                    '&.Mui-focused': {
-                      color: '#e53935'
-                    }
-                  }}
-                >
-                  Language
-                </InputLabel>
-                <Select
-                  value={selectedLanguage}
-                  onChange={(e) => setSelectedLanguage(e.target.value)}
-                  sx={{ 
-                    borderRadius: '12px',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e0e0e0'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e53935'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e53935'
-                    },
-                    color: '#37474f'
-                  }}
-                >
-                  <MenuItem value="">All Languages</MenuItem>
-                  {languages.map((lang) => (
-                    <MenuItem 
-                      key={lang.code} 
-                      value={lang.code}
-                      sx={{
-                        '&:hover': {
-                          bgcolor: '#ffebee'
-                        },
-                        '&.Mui-selected': {
-                          bgcolor: '#ffebee',
-                          '&:hover': {
-                            bgcolor: '#ffcdd2'
-                          }
-                        }
-                      }}
-                    >
-                      {lang.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth>
-                <InputLabel 
-                  sx={{ 
-                    color: '#9e9e9e',
-                    '&.Mui-focused': {
-                      color: '#e53935'
-                    }
-                  }}
-                >
-                  Region
-                </InputLabel>
-                <Select
-                  value={selectedRegion}
-                  onChange={(e) => setSelectedRegion(e.target.value)}
-                  sx={{ 
-                    borderRadius: '12px',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e0e0e0'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e53935'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e53935'
-                    },
-                    color: '#37474f'
-                  }}
-                >
-                  {regions.map((region) => (
-                    <MenuItem 
-                      key={region.code} 
-                      value={region.code}
-                      sx={{
-                        '&:hover': {
-                          bgcolor: '#ffebee'
-                        },
-                        '&.Mui-selected': {
-                          bgcolor: '#ffebee',
-                          '&:hover': {
-                            bgcolor: '#ffcdd2'
-                          }
-                        }
-                      }}
-                    >
-                      {region.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <FormControl sx={{ minWidth: 200 }}>
+                  <InputLabel sx={{ color: '#666' }}>Genre</InputLabel>
+                  <Select
+                    value={selectedGenre}
+                    onChange={(e) => setSelectedGenre(e.target.value)}
+                    label="Genre"
+                    sx={{
+                      bgcolor: '#121212',
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#333',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#666',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'red',
+                      },
+                    }}
+                  >
+                    <MenuItem value="">All Genres</MenuItem>
+                    {genres.map((genre) => (
+                      <MenuItem key={genre.id} value={genre.id}>
+                        {genre.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl sx={{ minWidth: 200 }}>
+                  <InputLabel sx={{ color: '#666' }}>Sort By</InputLabel>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    label="Sort By"
+                    sx={{
+                      bgcolor: '#121212',
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#333',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#666',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'red',
+                      },
+                    }}
+                  >
+                    <MenuItem value="popularity.desc">Most Popular</MenuItem>
+                    <MenuItem value="vote_average.desc">Highest Rated</MenuItem>
+                    <MenuItem value="release_date.desc">Newest First</MenuItem>
+                    <MenuItem value="release_date.asc">Oldest First</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </Grid>
           </Grid>
         </Paper>
 
-        {/* Results Count */}
-        <Typography 
-          variant="body1" 
-          sx={{ 
-            mb: 3,
-            bgcolor: 'white',
-            p: 2,
-            borderRadius: '12px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            color: '#37474f',
-            fontWeight: 500,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}
-        >
-          <Box 
-            component="span" 
-            sx={{ 
-              color: '#e53935',
-              fontWeight: 600 
-            }}
-          >
-            {filteredMovies.length}
-          </Box>
-          {filteredMovies.length === 1 ? 'movie' : 'movies'} found
-        </Typography>
-
-        {/* Empty State */}
-        {filteredMovies.length === 0 && (
-          <Box sx={{ 
-            textAlign: 'center', 
-            py: 4, 
-            bgcolor: 'white', 
-            borderRadius: 2,
-            boxShadow: 1
-          }}>
-            <Typography 
-              variant="h6" 
-              sx={{ color: '#455a64' }}
-            >
-              No movies found matching your search.
-            </Typography>
-          </Box>
-        )}
-
         {/* Movies Grid */}
         <Grid container spacing={3}>
-          {loading ? (
-            Array.from(new Array(8)).map((_, index) => (
-              <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <Paper sx={{ p: 2, height: '100%', borderRadius: 2, boxShadow: 1 }}>
-                  <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-                  <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
-                  <Skeleton variant="text" width="40%" />
-                </Paper>
-              </Grid>
-            ))
-          ) : filteredMovies.length === 0 ? (
-            <Grid item xs={12}>
-              <Box sx={{ 
-                textAlign: 'center', 
-                py: 4, 
-                bgcolor: 'white', 
-                borderRadius: 2,
-                boxShadow: 1
-              }}>
-                <Typography variant="h6" color="text.secondary">
-                  No movies found matching your search.
-                </Typography>
-              </Box>
-            </Grid>
-          ) : (
-            filteredMovies.map((movie) => (
-              <Grid item key={movie.id} xs={12} sm={6} md={4} lg={3}>
-                <MovieCard 
-                  movie={movie} 
-                  onBook={(id) => navigate(`/booking/${id}`)}
+          {movies.map((movie) => (
+            <Grid item key={movie.id} xs={6} sm={4} md={3}>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                  bgcolor: '#1a1a1a',
+                  transition: 'transform 0.3s ease-in-out',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                  },
+                }}
+                onClick={() => navigate(`/movie/${movie.id}`)}
+              >
+                <CardMedia
+                  component="img"
+                  height="400"
+                  image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  sx={{
+                    objectFit: 'cover',
+                    borderBottom: '2px solid #333',
+                    aspectRatio: '2/3',
+                    width: '100%',
+                    height: 'auto',
+                  }}
                 />
-              </Grid>
-            ))
-          )}
+                <CardContent sx={{ 
+                  flexGrow: 1, 
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  height: '200px',
+                }}>
+                  <Box>
+                    <Typography 
+                      gutterBottom 
+                      variant="h6" 
+                      component="div"
+                      sx={{
+                        color: 'white',
+                        fontWeight: 600,
+                        fontSize: '1.1rem',
+                        mb: 1,
+                        height: '2.5rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                      }}
+                    >
+                      {movie.title}
+                    </Typography>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mb: 1,
+                    }}>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          color: '#e0e0e0',
+                          fontWeight: 500,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                        }}
+                      >
+                        ⭐ {movie.vote_average.toFixed(1)}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          color: '#e0e0e0',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {new Date(movie.release_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      mt: 1,
+                      bgcolor: 'red',
+                      '&:hover': {
+                        bgcolor: 'darkred',
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBookNow(movie.id);
+                    }}
+                  >
+                    Book Now
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
+
+        {/* Pagination */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(e, value) => setCurrentPage(value)}
+            color="primary"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: '#e0e0e0',
+                '&.Mui-selected': {
+                  bgcolor: 'red',
+                  color: 'white',
+                  '&:hover': {
+                    bgcolor: 'darkred',
+                  },
+                },
+              },
+            }}
+          />
+        </Box>
       </Container>
 
-      {/* Add Movie Dialog */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle sx={{ color: '#1a237e' }}>Add New Movie</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Title"
-              name="title"
-              value={newMovie.title}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Overview"
-              name="overview"
-              value={newMovie.overview}
-              onChange={handleInputChange}
-              multiline
-              rows={4}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Poster Path (URL)"
-              name="posterPath"
-              value={newMovie.posterPath}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Release Date"
-              name="releaseDate"
-              type="date"
-              value={newMovie.releaseDate}
-              onChange={handleInputChange}
-              InputLabelProps={{ shrink: true }}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Rating"
-              name="rating"
-              type="number"
-              value={newMovie.rating}
-              onChange={handleInputChange}
-              inputProps={{ min: 0, max: 10, step: 0.1 }}
-            />
-            <DialogActions>
-              <Button onClick={handleDialogClose}>Cancel</Button>
-              <Button type="submit" variant="contained">
-                Add Movie
-              </Button>
-            </DialogActions>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity={snackbar.severity}
-          sx={{
-            '& .MuiAlert-message': {
-              color: snackbar.severity === 'success' ? '#1b5e20' : '#b71c1c'
-            }
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      <LoginDialog
+        open={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+        onSuccess={handleLoginSuccess}
+        onSignupClick={() => {
+          setIsLoginOpen(false);
+        }}
+      />
     </Box>
   );
 };
