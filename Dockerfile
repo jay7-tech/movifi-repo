@@ -4,18 +4,14 @@ FROM eclipse-temurin:17-jdk-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy the Maven wrapper and pom.xml
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY backend/pom.xml backend/
-COPY frontend/pom.xml frontend/
+# Install Maven
+RUN apk add --no-cache maven
 
-# Make the mvnw script executable
-RUN chmod +x mvnw
+# Copy the entire project
+COPY . .
 
-# Copy the source code
-COPY backend/src backend/src
+# Build the application
+RUN mvn clean package -DskipTests
 
-# Build and run the application
-CMD ["./mvnw", "spring-boot:run"] 
+# Run the application
+CMD ["java", "-jar", "backend/target/*.jar"] 
