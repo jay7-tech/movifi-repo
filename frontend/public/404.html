@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Movifi - Movie Ticket Booking</title>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafgraph/spa-github-pages
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      var r = l.pathname.split('/');
+      var d = l.href.split('/');
+      var i = d.indexOf(r[r.length-1]);
+      var baseUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + d.slice(0, i+1).join('/') + '/';
+      var repo = d.slice(0, i+1).join('/').replace(/^\//, '');
+      var rest = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep);
+      var restPath = rest.join('/');
+      var restUrl = restPath ? '/' + restPath : '';
+      var url = baseUrl + '#' + restUrl;
+      window.location.replace(url);
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <h1>Redirecting...</h1>
+    </noscript>
+  </body>
+</html> 
