@@ -74,7 +74,7 @@ const Index = () => {
             zIndex: 0,
           }}
         >
-          <source src="/src/assets/Videos/Background.mp4" type="video/mp4" />
+          <source src="/videos/Background.mp4" type="video/mp4" />
         </video>
         
         {/* Overlay */}
