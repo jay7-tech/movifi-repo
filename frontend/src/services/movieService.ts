@@ -32,7 +32,8 @@ const handleApiError = (error: unknown) => {
     const axiosError = error as AxiosError;
     if (axiosError.response) {
       console.error('TMDB API Error Response:', axiosError.response.data);
-      if (axiosError.response.data?.status_code === 7) {
+      const errorData = axiosError.response.data as TMDBError;
+      if (errorData?.status_code === 7) {
         throw new Error('Invalid TMDB API key. Please provide a valid API key in your .env file');
       }
       throw new Error(`TMDB API Error: ${axiosError.response.status} - ${JSON.stringify(axiosError.response.data)}`);
