@@ -1,0 +1,13 @@
+[build]
+builder = "nixpacks"
+buildCommand = "./mvnw clean package -DskipTests"
+
+[deploy]
+startCommand = "java -jar target/*.jar"
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[deploy.env]
+SPRING_PROFILES_ACTIVE = "prod" 
