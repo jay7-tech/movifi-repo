@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    volumes:
+      - static_volume:/usr/share/nginx/html
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    networks:
+      - movifi_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ./backend/logs:/app/logs
+    depends_on:
+      - db
+    networks:
+      - movifi_network
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - movifi_network
+
+  redis:
+    image: redis:7.0-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - movifi_network
+
+  cdn:
+    image: nginx:alpine
+    volumes:
+      - static_volume:/usr/share/nginx/html
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - movifi_network
+
+networks:
+  movifi_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  static_volume: 
