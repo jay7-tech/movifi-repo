@@ -5,11 +5,13 @@ FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
 # Install Maven and other dependencies
-RUN apk add --no-cache maven bash
+RUN apk add --no-cache maven bash curl
 
 # Set environment variables
 ENV MAVEN_OPTS="-Xmx512m"
 ENV JAVA_OPTS="-Xmx512m"
+ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # Copy the entire project
 COPY . .
@@ -18,7 +20,11 @@ COPY . .
 RUN mvn clean package -DskipTests || (echo "Maven build failed" && exit 1)
 
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE ${PORT}
 
-# Run the application with proper error handling
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/actuator/health || exit 1
+
+# Run the application with proper error handling and Railway environment variables
 CMD ["sh", "-c", "java $JAVA_OPTS -jar backend/target/*.jar"] 

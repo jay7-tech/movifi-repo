@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'node:path';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,7 +19,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,
+    sourcemap: true,
     minify: 'terser',
     terserOptions: {
       compress: {
@@ -31,7 +31,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@mui/material', '@mui/icons-material'],
+          ui: ['@mui/material', '@emotion/react', '@emotion/styled'],
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
