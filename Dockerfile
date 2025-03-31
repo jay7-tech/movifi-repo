@@ -17,8 +17,9 @@ RUN chmod +x mvnw
 # Copy the source code
 COPY backend/src backend/src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build the application with caching
+RUN --mount=type=cache,target=/root/.m2/repository \
+    ./mvnw clean package -DskipTests
 
 # Run the application
 CMD ["java", "-jar", "backend/target/*.jar"] 
