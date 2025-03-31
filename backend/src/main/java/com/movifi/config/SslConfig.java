@@ -22,7 +22,7 @@ public class SslConfig {
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000))
                 .xssProtection(xss -> xss
-                    .block(true))
+                    .enable(true))
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;")));
         
