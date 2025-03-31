@@ -8,6 +8,17 @@ interface Region {
   name: string;
 }
 
+interface TMDBError {
+  status_code: number;
+  status_message: string;
+  success: boolean;
+}
+
+interface TMDBResponse<T> {
+  data: T;
+  error?: TMDBError;
+}
+
 export const regions: Region[] = [
   { code: 'IN', name: 'India' },
   { code: 'US', name: 'United States' },

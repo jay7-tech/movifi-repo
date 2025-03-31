@@ -25,40 +25,44 @@ const handleApiError = (error: unknown, operation: string) => {
   throw error;
 };
 
-const backendMovieService = {
-  getAllMovies: async (): Promise<BackendMovie[]> => {
+export const backendMovieService = {
+  async getMovies(): Promise<BackendMovie[]> {
     try {
       const response = await apiClient.get('/movies');
       return response.data;
     } catch (error) {
-      handleApiError(error, 'getAllMovies');
+      console.error('Error fetching movies:', error);
+      return [];
     }
   },
 
-  getMovie: async (id: number): Promise<BackendMovie> => {
+  async getMovieById(id: string): Promise<BackendMovie | null> {
     try {
       const response = await apiClient.get(`/movies/${id}`);
       return response.data;
     } catch (error) {
-      handleApiError(error, 'getMovie');
+      console.error('Error fetching movie:', error);
+      return null;
     }
   },
 
-  createMovie: async (movie: Omit<BackendMovie, 'id'>): Promise<BackendMovie> => {
+  async createMovie(movieData: BackendMovie): Promise<BackendMovie | null> {
     try {
-      const response = await apiClient.post('/movies', movie);
+      const response = await apiClient.post('/movies', movieData);
       return response.data;
     } catch (error) {
-      handleApiError(error, 'createMovie');
+      console.error('Error creating movie:', error);
+      return null;
     }
   },
 
-  updateMovie: async (id: number, movie: Partial<BackendMovie>): Promise<BackendMovie> => {
+  async updateMovie(id: string, movieData: Partial<BackendMovie>): Promise<BackendMovie | null> {
     try {
-      const response = await apiClient.put(`/movies/${id}`, movie);
+      const response = await apiClient.put(`/movies/${id}`, movieData);
       return response.data;
     } catch (error) {
-      handleApiError(error, 'updateMovie');
+      console.error('Error updating movie:', error);
+      return null;
     }
   },
 
